@@ -90,7 +90,7 @@ class MultiHeadAttention(nn.Module):
         qkv = qkv.permute(0, 2, 1, 3)
         q, k, v = qkv.chunk(3, dim=-1)
         values, attention = scaled_dot_product(q, k, v, mask)
-        values = values.reshape(batch_size, sequence_length, self.num_heads * self.head_dim)
+        values = values.permute(0, 2, 1, 3).reshape(batch_size, sequence_length, self.num_heads * self.head_dim)
         out = self.linear_layer(values)
         return out
 
@@ -200,7 +200,7 @@ class MultiHeadCrossAttention(nn.Module):
         q = q.permute(0, 2, 1, 3)
         k, v = kv.chunk(2, dim=-1)
         values, attention = scaled_dot_product(q, k, v, mask) # We don't need the mask for cross attention, removing in outer function!
-        values = values.reshape(batch_size, sequence_length, d_model)
+        values = values.permute(0, 2, 1, 3).reshape(batch_size, sequence_length, d_model)
         out = self.linear_layer(values)
         return out
 
